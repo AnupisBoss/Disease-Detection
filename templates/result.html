@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #fafafa;
+            color: #222;
+            text-align: center;
+        }
+        h1 {
+            color: #b22222;
+        }
+        h3 {
+            color: #444;
+        }
+        img {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            border: 3px solid #b22222;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 0 15px rgba(178,34,34,0.5);
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            background-color: #b22222;
+            color: white;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #7f1616;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prediction: {{ label }}</h1>
+    <h3>Confidence: {{ '%.2f' % (confidence * 100) }}%</h3>
+    <img src="{{ heatmap_img }}" alt="Grad-CAM Heatmap Overlay">
+    <br>
+    <a href="{{ url_for('index') }}">Try Another Image</a>
+</body>
+</html>

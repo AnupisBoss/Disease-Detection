@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COVID-19 Early Detection System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-lungs"></i> COVID-19 Detection System</h1>
+            <p>Advanced AI-powered chest X-ray analysis for early detection</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="file-upload-area"> 
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text" id="uploadText">
+                        Drag & drop your chest X-ray image here
+                    </div>
+                    <div class="upload-subtext">
+                        or click to browse files (JPG, PNG, JPEG)
+                    </div>
+                    <input type="file" id="fileInput" name="file" accept="image/*" />
+                    <button type="button" class="btn-secondary" id="selectFileBtn">
+                        <i class="fas fa-folder-open"></i> Select File
+                    </button>
+                </div>
+                
+                <div class="selected-file" id="selectedFile" style="display: none;">
+                    <div class="file-preview">
+                        <img id="previewImage" src="" alt="Selected image" />
+                        <div class="file-info">
+                            <div class="file-name" id="fileName"></div>
+                            <div class="file-size" id="fileSize"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove" id="removeFileBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+                <input type="file" id="hiddenFileInput" name="file" style="display: none;" />
+                <div class="action-buttons">
+                    <button type="submit" class="btn-primary" id="analyzeBtn" disabled>
+                        <i class="fas fa-search"></i> Analyze Image
+                    </button>
+                </div>
+            </form>
+
+            <div class="processing-indicator" id="processingIndicator">
+                <div class="spinner"></div>
+                <p>Analyzing image with AI model...</p>
+            </div>
+        </div>
+
+        {% if history %}
+        <div class="history-section">
+            <h2 class="history-title">
+                <i class="fas fa-history"></i>
+                Recent Analysis History
+                <button class="clear-history-btn" onclick="clearAllHistory()">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </h2>
+            <div class="history-grid">
+                {% for item in history %}
+                <div class="history-card" onclick="openModal('{{ item.orig_img }}', '{{ item.heatmap_img }}', '{{ item.label }}', {{ item.confidence }})">
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteHistoryItem({{ loop.index0 }})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="card-image-container">
+                        <img class="card-image" src="{{ item.orig_img }}" alt="Chest X-ray" />
+                        <img class="card-heatmap" src="{{ item.heatmap_img }}" alt="AI Heatmap" />
+                    </div>
+                    <div class="card-info">
+                        <div class="prediction-label {{ item.label.lower().replace(' ', '_') }}">
+                            {{ item.label }}
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill {{ item.label.lower().replace(' ', '_') }}" 
+                                 data-confidence="{{ item.confidence }}"></div>
+                        </div>
+                        <div class="confidence-text">
+                            Confidence: {{ '%.1f' % (item.confidence * 100) }}%
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal for detailed view -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-images">
+                <div class="modal-image">
+                    <img id="modalOriginal" src="" alt="Original X-ray" />
+                    <h3>Original X-ray</h3>
+                </div>
+                <div class="modal-image">
+                    <img id="modalHeatmap" src="" alt="AI Analysis" />
+                    <h3>AI Heatmap Analysis</h3>
+                </div>
+            </div>
+            <div id="modalInfo"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
